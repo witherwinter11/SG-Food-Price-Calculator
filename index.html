@@ -280,7 +280,7 @@
 
     <div class="result" id="result"></div>
 <button id="add-person-btn">Add Person</button>
-    <button id="share-btn">Share Breakdown</button>
+    <button id="share-btn">Share </button>
     <div id="image-preview"></div>
   </div>
 
@@ -355,22 +355,56 @@
       document.getElementById('split')?.addEventListener('change', () => {
         document.getElementById('split-container').style.display = 'block';
         document.getElementById('individual-container').style.display = 'none';
+
+        // Clear all inputs in the individual table
+        const container = document.getElementById('person-container');
+        container.querySelectorAll('.form-group').forEach((group, index) => {
+          if (index === 0) {
+            group.querySelectorAll('input').forEach(input => input.value = '');
+            group.querySelector('.pre-gst').textContent = '';
+            group.querySelector('.base-total').textContent = '';
+            group.querySelector('.gst').textContent = '';
+            group.querySelector('.subtotal').textContent = '';
+          } else {
+            group.remove();
+          }
+        });
+
         calculate();
       });
 
       document.getElementById('share-btn').addEventListener('click', () => {
-        const table = document.createElement('table');
-        table.style.borderCollapse = 'collapse';
-        table.innerHTML = '<tr><th>Name</th><th>Subtotal</th></tr>';
-        document.querySelectorAll('.form-group').forEach(group => {
-          const name = group.querySelector('.name')?.value || 'Unnamed';
-          const subtotal = group.querySelector('.subtotal')?.textContent.split('$')[1] || '0.00';
-          const row = document.createElement('tr');
-          row.innerHTML = `<td style="border:1px solid #ccc;padding:6px;">${name}</td><td style="border:1px solid #ccc;padding:6px;">$${parseFloat(subtotal).toFixed(2)}</td>`;
-          table.appendChild(row);
-        });
+        const isSplit = document.getElementById('split').checked;
         const preview = document.getElementById('image-preview');
         preview.innerHTML = '';
+        preview.style.display = 'block';
+
+        const table = document.createElement('table');
+        table.style.borderCollapse = 'collapse';
+
+        if (isSplit) {
+          const total = parseFloat(document.getElementById('split-total')?.value || 0);
+          const pax = parseInt(document.getElementById('split-pax')?.value || 1);
+          if (pax > 0) {
+            const perPerson = total / pax;
+            table.innerHTML = '<tr><th colspan="2">Each Person Pays</th></tr>';
+            for (let i = 1; i <= pax; i++) {
+              const row = document.createElement('tr');
+              row.innerHTML = `<td style="border:1px solid #ccc;padding:6px;">Person ${i}</td><td style="border:1px solid #ccc;padding:6px;">$${perPerson.toFixed(2)}</td>`;
+              table.appendChild(row);
+            }
+          }
+        } else {
+          table.innerHTML = '<tr><th>Name</th><th>Subtotal</th></tr>';
+          document.querySelectorAll('.form-group').forEach(group => {
+            const name = group.querySelector('.name')?.value || 'Unnamed';
+            const subtotal = group.querySelector('.subtotal')?.textContent.split('$')[1] || '0.00';
+            const row = document.createElement('tr');
+            row.innerHTML = `<td style="border:1px solid #ccc;padding:6px;">${name}</td><td style="border:1px solid #ccc;padding:6px;">$${parseFloat(subtotal).toFixed(2)}</td>`;
+            table.appendChild(row);
+          });
+        }
+
         preview.appendChild(table);
         preview.style.display = 'block';
         html2canvas(preview).then(canvas => {
