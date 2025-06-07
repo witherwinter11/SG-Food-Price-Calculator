@@ -8,7 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
-    :root {
+:root {
       --primary: #9b2c2c;
       --accent: #f97316;
       --bg: #fff8f0;
@@ -38,11 +38,19 @@
       width: 100%;
     }
     h2 {
-      text-align: center;
+      text-align: Center;
       margin-bottom: 20px;
       color: var(--primary);
       font-family: 'Rubik', sans-serif;
     }
+
+    h4 {
+      text-align: left;
+      margin-bottom: 20px;
+      color: #9b2c2c;
+      font-family: 'Rubik', sans-serif;
+    }
+
     label {
       display: block;
       margin-top: 15px;
@@ -77,7 +85,7 @@
       cursor: pointer;
       line-height: 1;
     }
-    .pre-gst, .base-total, .subtotal {
+    .pre-gst, .base-total, .gst, .subtotal {
       text-align: right;
       font-weight: 600;
     }
@@ -147,6 +155,8 @@
     }
     #image-preview { display: none; margin-top: 20px; }
     fieldset.charges-toggle-group {
+  border-bottom: 2px dashed #d1d5db;
+  margin-bottom: 24px;
       border: 1px solid #e5e7eb;
       border-radius: var(--rounded);
       padding: 16px;
@@ -212,147 +222,175 @@
 </head>
 <body>
   <div class="container">
-    <h2>SG Food Bill Splitter</h2>
+    <h2>SG Food Bill Calculator</h2>
     <div class="segment-toggle">
-      <input type="radio" name="bill-mode" id="individual" checked>
-      <label for="individual">Calculate my portion</label>
-      <input type="radio" name="bill-mode" id="split">
-      <label for="split">Split Bill Equally</label>
+      <input type="radio" name="mode" id="individual" checked>
+      <label for="individual">Individual</label>
+      <input type="radio" name="mode" id="split">
+      <label for="split">Split Equally</label>
       <div class="slider-bg"></div>
     </div>
-    <fieldset class="charges-toggle-group">
-      <legend>Restaurant Charges</legend>
-      <div class="toggle-item">
-        <label class="toggle-label" for="include-svc">Service Charge</label>
-        <label class="switch">
-          <input type="checkbox" id="include-svc" checked>
-          <span class="slider round"></span>
-        </label>
+
+    <h4>Restaurant Charges</h4>
+    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+    <div id="individual-container">
+      <div class="charges-box">
+        <div class="toggle-item">
+          <span class="toggle-label">Service Charge</span>
+          <label class="switch">
+            <input type="checkbox" id="toggle-svc">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="toggle-item">
+          <span class="toggle-label">GST</span>
+          <label class="switch">
+            <input type="checkbox" id="toggle-gst">
+            <span class="slider"></span>
+          </label>
+        </div>
       </div>
-      <div class="toggle-item">
-        <label class="toggle-label" for="include-gst">GST (9%)</label>
-        <label class="switch">
-          <input type="checkbox" id="include-gst" checked>
-          <span class="slider round"></span>
-        </label>
+      <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+      <div id="person-container">
+        <div class="form-group">
+          <button class="remove-btn">&times;</button>
+          <label>Name</label>
+          <input type="text" class="name" placeholder="Enter name">
+          <label>Food Amount</label>
+          <input type="number" class="food" step="0.1">
+          <label>Beverage Amount</label>
+          <input type="number" class="beverage" step="0.1">
+          <div class="pre-gst"></div>
+          <div class="base-total"></div>
+          <div class="gst"></div>
+          <div class="subtotal"></div>
+        </div>
       </div>
-    </fieldset>
-    <p id="explanation-text">Enter Amount without GST and Service Charge</p>
-    <div id="person-container">
-      <div class="form-group">
-        <button class="remove-btn" title="Remove Person">×</button>
-        <label>Name (optional):</label>
-        <input type="text" class="name" placeholder="e.g. John" />
-        <label>Base Food Price (SGD):</label>
-        <input type="number" class="food" placeholder="e.g. 50.00" step="0.01" />
-        <label>Beverage Price (SGD):</label>
-        <input type="number" class="beverage" placeholder="e.g. 10.00" step="0.01" />
-        <div class="pre-gst">Base Amount: $0.00</div>
-        <div class="base-total">Service Charge: $0.00</div>
-        <div class="subtotal">Subtotal: $0.00</div>
-      </div>
+      <button id="add-person-btn">Add Person</button>
     </div>
-    <div class="result" id="result">Total Bill Amount: $0.00</div>
-    <button id="add-person-btn">+ Add Person</button>
-    <button id="share-btn"><i class="fab fa-whatsapp"></i> Share via WhatsApp</button>
+
+    <div id="split-container" style="display: none;">
+      <label>Total Amount</label>
+      <input type="number" id="split-total" step="0.1">
+      <label>Number of People</label>
+      <input type="number" id="split-pax" step="1">
+    </div>
+
+    <div class="result" id="result"></div>
+    <button id="share-btn">Share via WhatsApp</button>
     <div id="image-preview"></div>
   </div>
+
   <script>
     function calculate() {
-      const svcIncluded = document.getElementById('include-svc').checked;
-      const gstIncluded = document.getElementById('include-gst').checked;
-      const sections = document.querySelectorAll('.form-group');
+      const isSplit = document.getElementById('split').checked;
+      const resultDisplay = document.getElementById('result');
+
+      if (isSplit) {
+        const total = parseFloat(document.getElementById('split-total')?.value || 0);
+        const pax = parseInt(document.getElementById('split-pax')?.value || 1);
+        if (pax > 0) {
+          const perPerson = total / pax;
+          resultDisplay.textContent = `Each Person Pays: $${perPerson.toFixed(2)}`;
+        } else {
+          resultDisplay.textContent = 'Please enter a valid number of people.';
+        }
+        return;
+      }
+
+      const svcChecked = document.getElementById('toggle-svc').checked;
+      const gstChecked = document.getElementById('toggle-gst').checked;
+
       let total = 0;
-      sections.forEach(group => {
+      document.querySelectorAll('.form-group').forEach(group => {
         const food = parseFloat(group.querySelector('.food')?.value || 0);
         const beverage = parseFloat(group.querySelector('.beverage')?.value || 0);
         const base = food + beverage;
-        const svc = svcIncluded ? base * 0.1 : 0;
-        const gst = gstIncluded ? (base + svc) * 0.09 : 0;
+        const svc = svcChecked ? base * 0.1 : 0;
+        const gst = gstChecked ? (base + svc) * 0.09 : 0;
         const subtotal = base + svc + gst;
         total += subtotal;
         group.querySelector('.pre-gst').textContent = `Base Amount: $${base.toFixed(2)}`;
-        const svcElement = group.querySelector('.base-total');
-        svcElement.style.display = svcIncluded ? 'block' : 'none';
-        svcElement.textContent = `Service Charge: $${svc.toFixed(2)}`;
-
-        let gstDisplay = group.querySelector('.gst');
-        if (!gstDisplay) {
-          gstDisplay = document.createElement('div');
-          gstDisplay.className = 'gst';
-          gstDisplay.style.textAlign = 'right';
-          gstDisplay.style.color = '#4B5563';
-          gstDisplay.style.fontWeight = '600';
-          group.querySelector('.subtotal').before(gstDisplay);
-        }
-        gstDisplay.style.display = gstIncluded ? 'block' : 'none';
-        gstDisplay.textContent = `GST (9%): $${gst.toFixed(2)}`;
-
+        group.querySelector('.base-total').textContent = svcChecked ? `Service Charge: $${svc.toFixed(2)}` : '';
+        group.querySelector('.gst').textContent = gstChecked ? `GST (9%): $${gst.toFixed(2)}` : '';
         group.querySelector('.subtotal').textContent = `Subtotal: $${subtotal.toFixed(2)}`;
       });
-      document.getElementById('result').textContent = `Total Bill Amount: $${total.toFixed(2)}`;
+      resultDisplay.textContent = `Total Bill Amount: $${total.toFixed(2)}`;
     }
 
-    document.getElementById('add-person-btn').addEventListener('click', () => {
-      const container = document.getElementById('person-container');
-      const clone = container.firstElementChild.cloneNode(true);
-      clone.querySelectorAll('input').forEach(input => input.value = '');
-      clone.querySelectorAll('.gst').forEach(g => g.remove());
-      container.appendChild(clone);
-      clone.querySelectorAll('input').forEach(input => input.addEventListener('input', calculate));
-    });
-
-    document.getElementById('person-container').addEventListener('click', e => {
-      if (e.target.closest('.remove-btn')) {
-        const group = e.target.closest('.form-group');
-        if (document.getElementById('person-container').children.length > 1) {
-          group.remove();
-          calculate();
-        } else {
-          alert('You must have at least one person.');
-        }
-      }
-    });
-
-    document.querySelectorAll('input').forEach(input => input.addEventListener('input', calculate));
-    document.getElementById('include-svc').addEventListener('change', calculate);
-    document.getElementById('include-gst').addEventListener('change', calculate);
-
-    document.getElementById('share-btn').addEventListener('click', () => {
-      const table = document.createElement('table');
-      table.style.borderCollapse = 'collapse';
-      table.innerHTML = '<tr><th>Name</th><th>Subtotal</th></tr>';
-      document.querySelectorAll('.form-group').forEach(group => {
-        const name = group.querySelector('.name')?.value || 'Unnamed';
-        const subtotal = group.querySelector('.subtotal')?.textContent.split('$')[1] || '0.00';
-        const row = document.createElement('tr');
-        row.innerHTML = `<td style="border:1px solid #ccc;padding:6px;">${name}</td><td style="border:1px solid #ccc;padding:6px;">$${parseFloat(subtotal).toFixed(2)}</td>`;
-        table.appendChild(row);
+    document.addEventListener('DOMContentLoaded', function () {
+      document.getElementById('add-person-btn')?.addEventListener('click', () => {
+        const container = document.getElementById('person-container');
+        const clone = container.firstElementChild.cloneNode(true);
+        clone.querySelectorAll('input').forEach(input => input.value = '');
+        container.appendChild(clone);
+        clone.querySelectorAll('input').forEach(input => input.addEventListener('input', calculate));
       });
-      const preview = document.getElementById('image-preview');
-      preview.innerHTML = '';
-      preview.appendChild(table);
-      preview.style.display = 'block';
-      html2canvas(preview).then(canvas => {
-        canvas.toBlob(blob => {
-          const file = new File([blob], 'bill.png', { type: 'image/png' });
-          if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            navigator.share({
-              title: 'SG Food Bill',
-              text: 'Here’s my food bill summary!',
-              files: [file]
-            }).catch(() => {
-              alert('Sharing failed. Screenshot and send manually.');
-            });
+
+      document.getElementById('person-container')?.addEventListener('click', e => {
+        if (e.target.closest('.remove-btn')) {
+          const group = e.target.closest('.form-group');
+          if (document.getElementById('person-container').children.length > 1) {
+            group.remove();
+            calculate();
           } else {
-            const message = encodeURIComponent('Here is our food bill summary');
-            window.open(`https://wa.me/?text=${message}`, '_blank');
+            alert('You must have at least one person.');
           }
+        }
+      });
+
+      document.querySelectorAll('input').forEach(input => input.addEventListener('input', calculate));
+      document.getElementById('toggle-svc')?.addEventListener('change', calculate);
+      document.getElementById('toggle-gst')?.addEventListener('change', calculate);
+
+      document.getElementById('individual')?.addEventListener('change', () => {
+        document.getElementById('split-container').style.display = 'none';
+        document.getElementById('individual-container').style.display = 'block';
+        calculate();
+      });
+
+      document.getElementById('split')?.addEventListener('change', () => {
+        document.getElementById('split-container').style.display = 'block';
+        document.getElementById('individual-container').style.display = 'none';
+        calculate();
+      });
+
+      document.getElementById('share-btn').addEventListener('click', () => {
+        const table = document.createElement('table');
+        table.style.borderCollapse = 'collapse';
+        table.innerHTML = '<tr><th>Name</th><th>Subtotal</th></tr>';
+        document.querySelectorAll('.form-group').forEach(group => {
+          const name = group.querySelector('.name')?.value || 'Unnamed';
+          const subtotal = group.querySelector('.subtotal')?.textContent.split('$')[1] || '0.00';
+          const row = document.createElement('tr');
+          row.innerHTML = `<td style="border:1px solid #ccc;padding:6px;">${name}</td><td style="border:1px solid #ccc;padding:6px;">$${parseFloat(subtotal).toFixed(2)}</td>`;
+          table.appendChild(row);
+        });
+        const preview = document.getElementById('image-preview');
+        preview.innerHTML = '';
+        preview.appendChild(table);
+        preview.style.display = 'block';
+        html2canvas(preview).then(canvas => {
+          canvas.toBlob(blob => {
+            const file = new File([blob], 'bill.png', { type: 'image/png' });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+              navigator.share({
+                title: 'SG Food Bill',
+                text: 'Here’s my food bill summary!',
+                files: [file]
+              }).catch(() => {
+                alert('Sharing failed. Screenshot and send manually.');
+              });
+            } else {
+              const message = encodeURIComponent('Here is our food bill summary');
+              window.open(`https://wa.me/?text=${message}`, '_blank');
+            }
+          });
         });
       });
-    });
 
-    calculate();
+      calculate();
+    });
   </script>
 </body>
 </html>
