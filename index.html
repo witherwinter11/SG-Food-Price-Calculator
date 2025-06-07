@@ -48,6 +48,7 @@
       text-align: left;
       margin-bottom: 20px;
       color: #9b2c2c;
+      font-weight: 100;
       font-family: 'Rubik', sans-serif;
     }
 
@@ -267,7 +268,7 @@
           <div class="subtotal"></div>
         </div>
       </div>
-      <button id="add-person-btn">Add Person</button>
+      
     </div>
 
     <div id="split-container" style="display: none;">
@@ -278,7 +279,8 @@
     </div>
 
     <div class="result" id="result"></div>
-    <button id="share-btn">Share via WhatsApp</button>
+<button id="add-person-btn">Add Person</button>
+    <button id="share-btn">Share Breakdown</button>
     <div id="image-preview"></div>
   </div>
 
@@ -380,7 +382,7 @@
                 text: 'Here’s my food bill summary!',
                 files: [file]
               }).catch(() => {
-                alert('Sharing failed. Screenshot and send manually.');
+                alert('Sharing Cancelled. Screenshot and send manually.');
               });
             } else {
               const message = encodeURIComponent('Here is our food bill summary');
