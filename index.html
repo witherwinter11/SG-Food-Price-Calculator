@@ -277,7 +277,7 @@
     </div>
 
     <div class="result" id="result"></div>
-    <button id="share-btn">Share via WhatsApp</button>
+    <button id="share-btn">Share Breakdown</button>
     <div id="image-preview"></div>
   </div>
 
@@ -311,7 +311,7 @@
         const subtotal = base + svc + gst;
         total += subtotal;
         group.querySelector('.pre-gst').textContent = `Base Amount: $${base.toFixed(2)}`;
-        group.querySelector('.base-total').textContent = svcChecked ? `Service Charge: $${svc.toFixed(2)}` : '';
+        group.querySelector('.base-total').textContent = svcChecked ? `Service Charge (10%): $${svc.toFixed(2)}` : '';
         group.querySelector('.gst').textContent = gstChecked ? `GST (9%): $${gst.toFixed(2)}` : '';
         group.querySelector('.subtotal').textContent = `Subtotal: $${subtotal.toFixed(2)}`;
       });
