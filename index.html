@@ -86,9 +86,7 @@
       line-height: 1;
     }
     .pre-gst, .base-total, .gst, .subtotal {
-      text-align: right;
-      font-weight: 600;
-    }
+  font-size: 13px;}
     .pre-gst { color: #6b7280; }
     .base-total { color: #111827; }
     .subtotal { color: var(--accent); }
@@ -218,7 +216,10 @@
     input:checked + .slider:before {
       transform: translateX(18px);
     }
-  </style>
+    input.beverage {
+    margin-bottom: 16px;
+  }
+</style>
 </head>
 <body>
   <div class="container">
@@ -259,7 +260,7 @@
           <label>Food Amount</label>
           <input type="number" class="food" step="0.1">
           <label>Beverage Amount</label>
-          <input type="number" class="beverage" step="0.1">
+<input type="number" class="beverage" step="0.1" class="beverage">
           <div class="pre-gst"></div>
           <div class="base-total"></div>
           <div class="gst"></div>
@@ -277,7 +278,7 @@
     </div>
 
     <div class="result" id="result"></div>
-    <button id="share-btn">Share Breakdown</button>
+    <button id="share-btn">Share via WhatsApp</button>
     <div id="image-preview"></div>
   </div>
 
@@ -311,7 +312,7 @@
         const subtotal = base + svc + gst;
         total += subtotal;
         group.querySelector('.pre-gst').textContent = `Base Amount: $${base.toFixed(2)}`;
-        group.querySelector('.base-total').textContent = svcChecked ? `Service Charge (10%): $${svc.toFixed(2)}` : '';
+        group.querySelector('.base-total').textContent = svcChecked ? `Service Charge: $${svc.toFixed(2)}` : '';
         group.querySelector('.gst').textContent = gstChecked ? `GST (9%): $${gst.toFixed(2)}` : '';
         group.querySelector('.subtotal').textContent = `Subtotal: $${subtotal.toFixed(2)}`;
       });
@@ -379,7 +380,7 @@
                 text: 'Here’s my food bill summary!',
                 files: [file]
               }).catch(() => {
-                alert('Sharing Cancelled. Screenshot and send manually.');
+                alert('Sharing failed. Screenshot and send manually.');
               });
             } else {
               const message = encodeURIComponent('Here is our food bill summary');
