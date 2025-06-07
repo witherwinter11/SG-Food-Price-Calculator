@@ -337,7 +337,7 @@
           if (navigator.canShare && navigator.canShare({ files: [file] })) {
             navigator.share({
               title: 'SG Food Bill',
-              text: 'Here’s my food bill summary!',
+              text: 'Here’s the food bill summary!',
               files: [file]
             }).catch(() => {
               alert("Sharing failed. You can screenshot and send it manually.");
