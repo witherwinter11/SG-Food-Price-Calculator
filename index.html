@@ -5,15 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SG Food Bill Calculator</title>
 
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Rubik:wght@500&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4C+X5Qf4K1xVyFtTj4Jms9C3S8sU8U+2bc4flA8zjT1fJp3yyzQbiG9+Rw2kjZhD6Unxw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <style>
     :root {
-      --primary: #9b2c2c; /* deep chili red */
-      --accent: #f97316;  /* warm orange */
-      --bg: #fff8f0;      /* soft cream */
+      --primary: #9b2c2c;
+      --accent: #f97316;
+      --bg: #fff8f0;
       --text: #2f2f2f;
       --light: #fef3c7;
       --muted: #9ca3af;
@@ -57,7 +57,7 @@
       color: var(--text);
     }
 
-    input {
+    input[type="number"], input[type="text"] {
       width: 100%;
       padding: 12px;
       font-size: 16px;
@@ -71,6 +71,35 @@
       outline: none;
     }
 
+    .form-group {
+      border: 1px solid #e5e7eb;
+      border-radius: var(--rounded);
+      padding: 20px;
+      margin-bottom: 20px;
+      background-color: #fff;
+      position: relative;
+    }
+
+    .subtotal {
+      margin-top: 10px;
+      text-align: right;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      background: none;
+      border: none;
+      color: #9b2c2c;
+      font-size: 22px;
+      font-weight: bold;
+      cursor: pointer;
+      line-height: 1;
+    }
+
     .result {
       text-align: center;
       margin-top: 25px;
@@ -80,15 +109,11 @@
       font-family: 'Rubik', sans-serif;
     }
 
-    .section {
-      display: none;
-    }
-
     #share-btn {
-      margin-top: 20px;
+      margin-top: 10px;
       width: 100%;
       padding: 12px;
-      background-color: var(--primary);
+      background-color: #7b241c;
       color: white;
       font-weight: bold;
       font-size: 16px;
@@ -99,183 +124,208 @@
     }
 
     #share-btn:hover {
-      background-color: #7b241c;
+      background-color: #25D366;
     }
 
-    .toggle-container {
+    #add-person-btn {
+      margin-top: 10px;
+      width: 100%;
+      padding: 10px;
+      background-color: #f3f4f6;
+      color:  #000000;
+      font-weight: 500;
+      font-size: 14px;
+      border: 1px solid #d1d5db;
+      border-radius: var(--rounded);
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+    }
+
+    #add-person-btn:hover {
+      background-color: #e5e7eb;
+    }
+
+    .segment-toggle {
+      position: relative;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      gap: 10px;
+      border-radius: 9999px;
+      background-color: var(--bg);
+      border: 1px solid var(--primary);
+      overflow: hidden;
+      margin-bottom: 12px;
     }
 
-    .toggle-label {
+    .segment-toggle input[type="radio"] {
+      display: none;
+    }
+
+    .segment-toggle label {
+      flex: 1;
+      padding: 12px 0;
+      text-align: center;
       font-weight: 600;
       font-size: 14px;
-      transition: color 0.3s ease;
-    }
-
-    .toggle-label.active {
-      color: var(--text);
-    }
-
-    .toggle-label.inactive {
-      color: var(--muted);
-    }
-
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 60px;
-      height: 32px;
-    }
-
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .slider {
-      position: absolute;
+      color: var(--primary);
       cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: var(--light);
-      transition: 0.4s;
-      border-radius: 32px;
+      z-index: 1;
+      position: relative;
+      transition: all 0.3s ease-in-out;
     }
 
-    .slider:before {
-      position: absolute;
+    .segment-toggle .slider-bg {
       content: "";
-      height: 24px;
-      width: 24px;
-      left: 4px;
-      bottom: 4px;
-      background-color: white;
-      transition: 0.4s;
-      border-radius: 50%;
-    }
-
-    input:checked + .slider {
+      position: absolute;
+      top: 2px;
+      bottom: 2px;
+      left: 2px;
+      width: calc(50% - 4px);
       background-color: var(--primary);
+      border-radius: 9999px;
+      transition: transform 0.3s ease;
+      z-index: 0;
     }
 
-    input:checked + .slider:before {
-      transform: translateX(28px);
+    .segment-toggle input#split:checked ~ .slider-bg {
+      transform: translateX(100%);
     }
 
-    @media (max-width: 480px) {
-      .container {
-        padding: 20px;
-      }
+    .segment-toggle input#individual:checked ~ .slider-bg {
+      transform: translateX(0);
+    }
+
+    .segment-toggle input#individual:checked + label[for="individual"],
+    .segment-toggle input#split:checked + label[for="split"] {
+      color: white;
+      font-weight: 700;
+    }
+
+    #explanation-text {
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+
+    #share-btn i {
+      margin-right: 8px;
     }
   </style>
 </head>
 <body>
-
   <div class="container">
-    <h2>SG Food Bill Calculator</h2>
+    <h2>SG Food Bill Splitter</h2>
 
-    <div class="toggle-container">
-      <span id="label-individual" class="toggle-label active">Pay Individually</span>
-      <label class="switch">
-        <input type="checkbox" id="mode-toggle" />
-        <span class="slider"></span>
-      </label>
-      <span id="label-split" class="toggle-label inactive">Split Equally</span>
+    <div class="segment-toggle">
+      <input type="radio" name="bill-mode" id="individual" checked>
+      <label for="individual">Calculate my portion</label>
+
+      <input type="radio" name="bill-mode" id="split">
+      <label for="split">Split Bill Equally</label>
+
+      <div class="slider-bg"></div>
     </div>
 
-    <div id="individual-section" class="section">
-      <label for="food">Base Food Price (SGD):</label>
-      <input type="number" id="food" placeholder="e.g. 50.00" step="0.01" min="0" />
+    <p id="explanation-text">Enter Amount without GST and Service Charge</p>
 
-      <label for="beverage">Base Beverage Price (SGD):</label>
-      <input type="number" id="beverage" placeholder="e.g. 10.00" step="0.01" min="0" />
+    <div id="person-container">
+      <div class="form-group">
+        <button class="remove-btn" title="Remove Person">×</button>
+        <label for="name">Name (optional):</label>
+        <input type="text" class="name" placeholder="e.g. John" />
+
+        <div class="individual-section">
+          <label>Base Food Price (SGD):</label>
+          <input type="number" class="food" placeholder="e.g. 50.00" step="0.01" min="0" />
+
+          <label>Beverage Price (SGD):</label>
+          <input type="number" class="beverage" placeholder="e.g. 10.00" step="0.01" min="0" />
+        </div>
+
+        <div class="subtotal">Subtotal: $0.00</div>
+      </div>
     </div>
 
-    <div id="split-section" class="section">
-      <label for="price">Final Bill Amount (SGD):</label>
-      <input type="number" id="price" placeholder="e.g. 50.00" step="0.01" min="0" />
+    <div id="split-section" style="display: none;">
+      <label>Total Bill Amount (SGD):</label>
+      <input type="number" id="total-bill" placeholder="e.g. 120.00" step="0.01" min="0" />
 
-      <label for="people">Number of People:</label>
-      <input type="number" id="people" placeholder="e.g. 5" min="1" />
+      <label>Number of People:</label>
+      <input type="number" id="num-people" placeholder="e.g. 4" min="1" />
     </div>
 
     <div class="result" id="result">Total to Pay: $0.00</div>
 
-    <button id="share-btn">📤 Share via WhatsApp</button>
+    <button id="add-person-btn">+ Add Person</button>
+    <button id="share-btn"><i class="fab fa-whatsapp"></i> Share via WhatsApp</button>
   </div>
 
   <script>
-    const modeToggle = document.getElementById('mode-toggle');
-    const foodInput = document.getElementById('food');
-    const beverageInput = document.getElementById('beverage');
-    const priceInput = document.getElementById('price');
-    const peopleInput = document.getElementById('people');
-    const resultDisplay = document.getElementById('result');
-    const individualSection = document.getElementById('individual-section');
-    const splitSection = document.getElementById('split-section');
-    const labelIndividual = document.getElementById('label-individual');
-    const labelSplit = document.getElementById('label-split');
-
-    function updateLabels() {
-      if (modeToggle.checked) {
-        labelIndividual.classList.remove('active');
-        labelIndividual.classList.add('inactive');
-        labelSplit.classList.add('active');
-        labelSplit.classList.remove('inactive');
-      } else {
-        labelIndividual.classList.add('active');
-        labelIndividual.classList.remove('inactive');
-        labelSplit.classList.remove('active');
-        labelSplit.classList.add('inactive');
-      }
-    }
-
     function calculate() {
-      const mode = modeToggle.checked ? 'split' : 'individual';
-      const multiplier = 1.199;
-
-      if (mode === 'individual') {
-        const food = parseFloat(foodInput.value) || 0;
-        const beverage = parseFloat(beverageInput.value) || 0;
-        const subtotal = food + beverage;
-        const total = (subtotal * multiplier).toFixed(2);
-        resultDisplay.textContent = `Total to Pay: $${total}`;
-      }
-
-      if (mode === 'split') {
-        const price = parseFloat(priceInput.value);
-        const people = parseInt(peopleInput.value);
-        if (!isNaN(price) && !isNaN(people) && people > 0) {
-          const perPerson = (price / people).toFixed(2);
-          resultDisplay.textContent = `Per Person: $${perPerson}`;
-        } else {
-          resultDisplay.textContent = 'Please enter valid amount & people.';
+      if (document.getElementById('individual').checked) {
+        const sections = document.querySelectorAll('.form-group');
+        let total = 0;
+        sections.forEach(group => {
+          const food = parseFloat(group.querySelector('.food')?.value || 0);
+          const beverage = parseFloat(group.querySelector('.beverage')?.value || 0);
+          const subtotal = (food + beverage) * 1.199;
+          total += subtotal;
+          const subtotalDiv = group.querySelector('.subtotal');
+          if (subtotalDiv) subtotalDiv.textContent = `Subtotal: $${subtotal.toFixed(2)}`;
+        });
+        document.getElementById('result').textContent = `Total Bill Amount: $${total.toFixed(2)}`;
+      } else {
+        const total = parseFloat(document.getElementById('total-bill').value || 0);
+        const people = parseInt(document.getElementById('num-people').value || 1);
+        if (people > 0) {
+          const perPerson = (total / people).toFixed(2);
+          document.getElementById('result').textContent = `Each Pays: $${perPerson}`;
         }
       }
     }
 
-    foodInput.addEventListener('input', calculate);
-    beverageInput.addEventListener('input', calculate);
-    priceInput.addEventListener('input', calculate);
-    peopleInput.addEventListener('input', calculate);
+    function removePerson(button) {
+      const group = button.closest('.form-group');
+      const container = document.getElementById('person-container');
+      if (container.children.length > 1) {
+        group.remove();
+        calculate();
+      } else {
+        alert("You must have at least one person.");
+      }
+    }
 
-    modeToggle.addEventListener('change', () => {
-      const mode = modeToggle.checked ? 'split' : 'individual';
-      updateLabels();
-      individualSection.style.display = mode === 'individual' ? 'block' : 'none';
-      splitSection.style.display = mode === 'split' ? 'block' : 'none';
+    document.getElementById('person-container').addEventListener('click', function(e) {
+      if (e.target.closest('.remove-btn')) {
+        removePerson(e.target.closest('.remove-btn'));
+      }
+    });
+
+    document.getElementById('add-person-btn').addEventListener('click', () => {
+      const container = document.getElementById('person-container');
+      const clone = container.firstElementChild.cloneNode(true);
+      clone.querySelectorAll('input').forEach(input => input.value = '');
+      container.appendChild(clone);
+      clone.querySelectorAll('input').forEach(input => input.addEventListener('input', calculate));
+    });
+
+    document.querySelectorAll('input').forEach(input => input.addEventListener('input', calculate));
+
+    document.getElementById('individual').addEventListener('change', () => {
+      document.getElementById('explanation-text').textContent = 'Enter Amount without GST and Service Charge';
+      document.getElementById('person-container').style.display = 'block';
+      document.getElementById('add-person-btn').style.display = 'block';
+      document.getElementById('split-section').style.display = 'none';
       calculate();
     });
 
-    updateLabels();
-    modeToggle.dispatchEvent(new Event('change'));
+    document.getElementById('split').addEventListener('change', () => {
+      document.getElementById('explanation-text').textContent = 'Enter final amount after GST and service charge';
+      document.getElementById('person-container').style.display = 'none';
+      document.getElementById('add-person-btn').style.display = 'none';
+      document.getElementById('split-section').style.display = 'block';
+      calculate();
+    });
 
     document.getElementById('share-btn').addEventListener('click', function () {
       const container = document.querySelector('.container');
@@ -299,6 +349,8 @@
         });
       });
     });
+
+    calculate();
   </script>
 </body>
 </html>
