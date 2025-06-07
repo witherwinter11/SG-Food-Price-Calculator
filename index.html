@@ -7,16 +7,15 @@
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Rubik:wght@500&display=swap" rel="stylesheet">
-  <!-- html2canvas for screenshot -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <style>
     :root {
-      --primary: #1e3a8a;
-      --accent: #f97316;
-      --bg: #f9fafb;
-      --text: #111827;
-      --light: #e5e7eb;
+      --primary: #9b2c2c; /* deep chili red */
+      --accent: #f97316;  /* warm orange */
+      --bg: #fff8f0;      /* soft cream */
+      --text: #2f2f2f;
+      --light: #fef3c7;
       --muted: #9ca3af;
       --rounded: 12px;
     }
@@ -24,7 +23,9 @@
     body {
       margin: 0;
       font-family: 'Inter', sans-serif;
-      background-color: var(--bg);
+      background: url('https://raw.githubusercontent.com/witherwinter11/SG-Food-Price-Calculator/main/BG_Food.png') no-repeat center center fixed;
+      background-size: cover;
+      backdrop-filter: brightness(0.9);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -33,9 +34,9 @@
     }
 
     .container {
-      background-color: #fff;
+      background-color: rgba(255, 248, 240, 0.97);
       border-radius: var(--rounded);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
       padding: 25px;
       max-width: 400px;
       width: 100%;
@@ -60,14 +61,13 @@
       width: 100%;
       padding: 12px;
       font-size: 16px;
-      border: 1px solid var(--light);
+      border: 1px solid #e2e8f0;
       border-radius: var(--rounded);
       box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
     }
 
     input:focus {
-      border-color: var(--primary);
+      border-color: var(--accent);
       outline: none;
     }
 
@@ -99,7 +99,7 @@
     }
 
     #share-btn:hover {
-      background-color: #172554;
+      background-color: #7b241c;
     }
 
     .toggle-container {
@@ -181,7 +181,6 @@
   <div class="container">
     <h2>SG Food Bill Calculator</h2>
 
-    <!-- Toggle Switch -->
     <div class="toggle-container">
       <span id="label-individual" class="toggle-label active">Pay Individually</span>
       <label class="switch">
@@ -191,7 +190,6 @@
       <span id="label-split" class="toggle-label inactive">Split Equally</span>
     </div>
 
-    <!-- Individual Mode -->
     <div id="individual-section" class="section">
       <label for="food">Base Food Price (SGD):</label>
       <input type="number" id="food" placeholder="e.g. 50.00" step="0.01" min="0" />
@@ -200,7 +198,6 @@
       <input type="number" id="beverage" placeholder="e.g. 10.00" step="0.01" min="0" />
     </div>
 
-    <!-- Split Mode -->
     <div id="split-section" class="section">
       <label for="price">Final Bill Amount (SGD):</label>
       <input type="number" id="price" placeholder="e.g. 119.90" step="0.01" min="0" />
@@ -277,11 +274,9 @@
       calculate();
     });
 
-    // Initial display
     updateLabels();
     modeToggle.dispatchEvent(new Event('change'));
 
-    // WhatsApp Share with screenshot
     document.getElementById('share-btn').addEventListener('click', function () {
       const container = document.querySelector('.container');
 
@@ -305,6 +300,5 @@
       });
     });
   </script>
-
 </body>
 </html>
