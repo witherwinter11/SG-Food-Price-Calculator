@@ -402,7 +402,15 @@ document.getElementById('split').addEventListener('change', () => {
     document.getElementById('split').addEventListener('change', () => {
       document.querySelector('.Restaurant-charge')?.classList.add('hidden');
     });
+    document.getElementById('individual').addEventListener('change', () => {
+      document.querySelector('.Restaurant-charge')?.classList.remove('hidden');
+      document.getElementById('add-person-btn')?.classList.remove('hidden');
+    });
 
+    document.getElementById('split').addEventListener('change', () => {
+      document.querySelector('.Restaurant-charge')?.classList.add('hidden');
+      document.getElementById('add-person-btn')?.classList.add('hidden');
+    });
 
       document.querySelectorAll('input').forEach(input => input.addEventListener('input', calculate));
       document.getElementById('toggle-svc')?.addEventListener('change', calculate);
