@@ -87,10 +87,14 @@
       line-height: 1;
     }
     .pre-gst, .base-total, .gst, .subtotal {
-  font-size: 13px;}
+      font-size: 13px;
+      text-align: right;
+}
+
     .pre-gst { color: #6b7280; }
     .base-total { color: #111827; }
     .subtotal { color: var(--accent); }
+
     .result {
       margin-top: 10px;
       text-align: center;
@@ -145,6 +149,15 @@
       transition: transform 0.3s ease;
       z-index: 0;
     }
+
+    #explanation-text {
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+
     .segment-toggle input#split:checked ~ .slider-bg { transform: translateX(100%); }
     .segment-toggle input#individual:checked ~ .slider-bg { transform: translateX(0); }
     .segment-toggle input#individual:checked + label[for="individual"],
@@ -233,6 +246,8 @@
       <div class="slider-bg"></div>
     </div>
 
+    <p id="explanation-text">This portion will automatically include the GST and Service Charge Breakdown When Selected. Simply fill in the nett price.</p>
+
     <h4>Restaurant Charges</h4>
     <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
     <div id="individual-container">
@@ -257,7 +272,7 @@
         <div class="form-group">
           <button class="remove-btn">&times;</button>
           <label>Name</label>
-          <input type="text" class="name" placeholder="Enter name">
+          <input type="text" class="name">
           <label>Food Amount</label>
           <input type="number" class="food" step="0.1">
           <label>Beverage Amount</label>
@@ -285,6 +300,9 @@
   </div>
 
   <script>
+
+// The function checks if the "Split Equally" option is selected, and if so, divides the total bill by the number of people to display how much each person should pay. If the number of people is invalid, it shows an error message instead. //
+
     function calculate() {
       const isSplit = document.getElementById('split').checked;
       const resultDisplay = document.getElementById('result');
@@ -301,6 +319,7 @@
         return;
       }
 
+      // Loop through each person's inputs to calculate subtotal with optional service charge and GST, then display the total bill amount.
       const svcChecked = document.getElementById('toggle-svc').checked;
       const gstChecked = document.getElementById('toggle-gst').checked;
 
@@ -314,13 +333,14 @@
         const subtotal = base + svc + gst;
         total += subtotal;
         group.querySelector('.pre-gst').textContent = `Base Amount: $${base.toFixed(2)}`;
-        group.querySelector('.base-total').textContent = svcChecked ? `Service Charge: $${svc.toFixed(2)}` : '';
+        group.querySelector('.base-total').textContent = svcChecked ? `Service Charge (10%): $${svc.toFixed(2)}` : '';
         group.querySelector('.gst').textContent = gstChecked ? `GST (9%): $${gst.toFixed(2)}` : '';
         group.querySelector('.subtotal').textContent = `Subtotal: $${subtotal.toFixed(2)}`;
       });
       resultDisplay.textContent = `Total Bill Amount: $${total.toFixed(2)}`;
     }
 
+    // Handle adding and removing person input sections dynamically, ensuring at least one remains and recalculating totals as needed.
     document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('add-person-btn')?.addEventListener('click', () => {
         const container = document.getElementById('person-container');
@@ -329,6 +349,22 @@
         container.appendChild(clone);
         clone.querySelectorAll('input').forEach(input => input.addEventListener('input', calculate));
       });
+
+    // Changes the Explanatory Text
+
+// Update explanation text when user toggles the mode
+
+const isSplitSelected = document.getElementById('individual').checked;
+document.getElementById('explanation-text').textContent = isSplitSelected
+  ? 'Enter final total amount (GST and Service Charge already included).'
+  : 'Enter amount without GST and Service Charge. It will be calculated for each person.';
+document.getElementById('individual').addEventListener('change', () => {
+  document.getElementById('explanation-text').textContent = 'Enter amount without GST and Service Charge. It will be calculated for each person.';
+});
+
+document.getElementById('split').addEventListener('change', () => {
+  document.getElementById('explanation-text').textContent = 'Enter final total amount (GST and Service Charge already included).';
+});
 
       document.getElementById('person-container')?.addEventListener('click', e => {
         if (e.target.closest('.remove-btn')) {
@@ -404,7 +440,6 @@
             table.appendChild(row);
           });
         }
-
         preview.appendChild(table);
         preview.style.display = 'block';
         html2canvas(preview).then(canvas => {
