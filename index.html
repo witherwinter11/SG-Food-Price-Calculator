@@ -44,12 +44,16 @@
       font-family: 'Rubik', sans-serif;
     }
 
-    h4 {
+   .Restaurant-charge {
       text-align: left;
       margin-bottom: 20px;
       color: #9b2c2c;
       font-weight: 100;
       font-family: 'Rubik', sans-serif;
+    }
+
+        .hidden {
+      display: none;
     }
 
     label {
@@ -248,7 +252,7 @@
 
     <p id="explanation-text">This portion will automatically include the GST and Service Charge Breakdown When Selected. Simply fill in the nett price.</p>
 
-    <h4>Restaurant Charges</h4>
+    <h4 class="Restaurant-charge">Restaurant Charges</h4>
     <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
     <div id="individual-container">
       <div class="charges-box">
@@ -352,7 +356,7 @@
 
     // Changes the Explanatory Text
 
-// Update explanation text when user toggles the mode
+// Sets default and Updates explanation text when user toggles the mode
 
 const isSplitSelected = document.getElementById('individual').checked;
 document.getElementById('explanation-text').textContent = isSplitSelected
@@ -366,6 +370,7 @@ document.getElementById('split').addEventListener('change', () => {
   document.getElementById('explanation-text').textContent = 'Enter final total amount (GST and Service Charge already included).';
 });
 
+//Deletes the person container and prompts an alert if the last person is deleted //
       document.getElementById('person-container')?.addEventListener('click', e => {
         if (e.target.closest('.remove-btn')) {
           const group = e.target.closest('.form-group');
@@ -377,6 +382,15 @@ document.getElementById('split').addEventListener('change', () => {
           }
         }
       });
+
+      document.getElementById('individual').addEventListener('change', () => {
+      document.querySelector('.Restaurant-charge')?.classList.remove('hidden');
+    });
+
+    document.getElementById('split').addEventListener('change', () => {
+      document.querySelector('.Restaurant-charge')?.classList.add('hidden');
+    });
+
 
       document.querySelectorAll('input').forEach(input => input.addEventListener('input', calculate));
       document.getElementById('toggle-svc')?.addEventListener('change', calculate);
