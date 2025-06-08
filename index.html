@@ -373,7 +373,7 @@ background-attachment: fixed;
 const isSplitSelected = document.getElementById('individual').checked;
 document.getElementById('explanation-text').textContent = isSplitSelected
   ? 'Enter final total amount (With GST and Service Charge Where Applicable).'
-  : 'Enter amount without GST and Service Charge. It will be calculated for each person.';
+  : 'Enter amount without GST and Service Charge. The breakdown will automatically be calculated for you.';
 document.getElementById('individual').addEventListener('change', () => {
   document.getElementById('explanation-text').textContent = 'Enter amount without GST and Service Charge. It will be calculated for each person.';
 });
