@@ -28,7 +28,14 @@
       align-items: center;
       min-height: 100vh;
       padding: 20px;
+background-attachment: fixed; 
+  animation: subtle-scroll 60s linear infinite;
     }
+@keyframes subtle-scroll {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+
     .container {
       background-color: white;
       border-radius: var(--rounded);
@@ -59,7 +66,9 @@
     label {
       display: block;
       margin-top: 15px;
-      font-weight: 600;
+      margin-bottom:4px;
+      font-weight: 300;
+      font-size: 15px;
       color: var(--text);
     }
     input[type="number"], input[type="text"] {
@@ -237,6 +246,9 @@
     input.beverage {
     margin-bottom: 16px;
   }
+
+  
+
 </style>
 </head>
 <body>
@@ -252,7 +264,7 @@
 
     <p id="explanation-text">This portion will automatically include the GST and Service Charge Breakdown When Selected. Simply fill in the nett price.</p>
 
-    <h4 class="Restaurant-charge">Restaurant Charges</h4>
+    <h4 class="Restaurant-charge">Does the Restaurant Charge</h4>
     <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
     <div id="individual-container">
       <div class="charges-box">
